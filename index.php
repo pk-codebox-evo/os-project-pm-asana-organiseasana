@@ -62,6 +62,14 @@ if ($apiKey && $storeKey) {
 	setcookie("apiKey", $apiKey, time()+60*60*24*90);
 }
 
+function isOrganisation($workspace) {
+	$org = isset($workspace['is_organization']) && $workspace['is_organization'];
+	if ($workspace['name'] == 'Personal Projects')
+		$org = false;
+		
+	return $org;
+}
+
 ?>
 <html>
 	<head>
@@ -143,14 +151,15 @@ if ($apiKey && $storeKey) {
 					$targetWorkspace = null;
 					$team = null;
 
-					if ($targetWorkspaceId)
+					if ($targetWorkspaceId) {
 						$targetWorkspace = getWorkspace($targetWorkspaceId);
+					}
 
 					if ($DEBUG) pre($targetWorkspace, "Target Workspace");
 
 					// Do we have what we need to run a copy?
 					if ($targetWorkspaceId && $projects) {
-						if (isset($targetWorkspace['is_organization']) && $targetWorkspace['is_organization']) {
+						if (isOrganisation($targetWorkspace)) {
 							if ($teamId) {
 								$team = getTeam($targetWorkspaceId, $teamId);
 								if ($DEBUG) pre($team, "Team");
@@ -271,7 +280,7 @@ if ($apiKey && $storeKey) {
 								$workspace = $workspaces[$i];
 
 								$type = ' btn-default';
-								if (isset($workspace['is_organization']) && $workspace['is_organization'])
+								if (isOrganisation($workspace))
 									$type = ' btn-warning';
 
 								$active = '';
@@ -288,18 +297,12 @@ if ($apiKey && $storeKey) {
 							if ($targetWorkspaceId) {
 								echo '<div class="col-sm-4">';
 								echo '<input type="hidden" name="targetWorkspace" value="' . $targetWorkspaceId . '"></input>';
-								$showTeams = $targetWorkspace['is_organization'];
+								$showTeams = isOrganisation($targetWorkspace);
 
 								// Handle Personal Projects
 								if ($showTeams) {
 									$teams = getTeams($targetWorkspaceId);
-									if (!$teams && $targetWorkspace['name'] == 'Personal Projects') {
-										$showTeams = false;
-										if ($DEBUG) p('Disabling teams for Personal Projects workspace');
-									}
-								}
-
-								if ($showTeams) {
+									
 									echo '<h2>for team</h2>';
 
 									echo '<div class="btn-group-vertical">';

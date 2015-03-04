@@ -24,6 +24,18 @@ function pre($o, $title = false, $style = 'info') {
 function isError($result) {
 	return isset($result['errors']) || !isset($result['data']);
 }
+
+function cleanTask($task) {
+	global $DEBUG;
+	if ($DEBUG) pre($task, "Cleaning task");
+	// "message": ".assignee_status: Schedule status shouldn't be set for unassigned tasks"
+	if (!$task['assignee']) {
+		unset($task['assignee_status']);
+		if ($DEBUG) pre($task, "Removed Assignee Status ('Schedule status shouldn't be set for unassigned tasks')", 'warn');
+	}
+	
+	return $task;	
+}
 	
 class Asana {
 	public $apiKey;
@@ -194,6 +206,9 @@ class Project {
 
 		// Set projects
 		$task['projects'] = array($projectId);
+		
+		// Validate task data
+		$task = cleanTask($task);
 
 		// Create new task
 		$data = array('data' => $task);
@@ -203,6 +218,10 @@ class Project {
 		// TODO check assignee exists before submitting the request
 		if (isError($result) && isset($task['assignee'])) {
 			unset($task['assignee']);
+			
+			// Validate task data
+			$task = cleanTask($task);
+		
 			$data = array('data' => $task);
 			$result = $this->asana->request("workspaces/$workspaceId/tasks", 'POST', $data);
 		}
@@ -356,23 +375,23 @@ class CopyProject {
 
 				// get data for subtask
 				$result = $this->asana->request("tasks/$subtaskId?opt_fields=assignee,assignee_status,completed,due_on,name,notes");
-				$newSubtask = $result['data'];
-				unset($newSubtask["id"]);
+				$task = $result['data'];
+				unset($task["id"]);
 			
-				p("&nbsp;&nbsp;Creating subtask: " . $newSubtask['name']);
+				p("&nbsp;&nbsp;Creating subtask: " . $task['name']);
 			
-				if (isset($newSubtask["assignee"]))
-					$newSubtask["assignee"] = $newSubtask["assignee"]["id"];
+				if (isset($task["assignee"]))
+					$task["assignee"] = $task["assignee"]["id"];
 
 				// create Subtask
-				$data = array('data' => $newSubtask );
+				$data = array('data' => cleanTask($task));
 				$result = $this->asana->request("tasks/$newTaskId/subtasks", 'POST', $data);
 			
 				// Try to remove assignee if an error is returned
 				// TODO check assignee exists before submitting the request
 				if (isError($result) && isset($task['assignee'])) {
 					unset($task['assignee']);
-					$data = array('data' => $task);
+					$data = array('data' => cleanTask($task));
 					$result = $this->asana->request("workspaces/$workspaceId/tasks", 'POST', $data);
 				}
 
