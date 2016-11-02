@@ -7,3 +7,5 @@ vendor/asana/asana/tests
 vendor/nategood/httpful/examples
 vendor/nategood/httpful/tests
 vendor/asana/asana/src/Asana/Test
+vendor/stil/curl-easy/tests
+vendor/symfony/event-dispatcher/Tests

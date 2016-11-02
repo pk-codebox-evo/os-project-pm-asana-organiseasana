@@ -1,5 +1,5 @@
 application: organise-asana
-version: 4
+version: 5
 runtime: php55
 api_version: 1
 threadsafe: true

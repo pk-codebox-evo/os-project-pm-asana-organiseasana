@@ -140,13 +140,16 @@ if($DEBUG >= 1) {
 				Copy <a href="https://asana.com" target="asana">Asana</a> projects from one workspace to another.
 			</p>
 
-			<?php $enabled = false; ?>
+			<?php $enabled = true; 
+				if (!$enabled) {
+			?>
 			<div class="bs-callout bs-callout-warning">
 				<h4>14th October 2016 - Service Delays</h4>
 				<p>There is currently a large backlog of tasks in the queue (the oldest tasks waiting are about 5 hours old). This may be due to high latency communicating with Asana, or just a lot
 				of people trying or retrying their copy operations.</p>
 				<p>To let the backlog clear I've turned up the rate of task processing and temporarily disabled new jobs - sorry for the inconvenience. I should be able to turn it back on tomorrow.</p>
 			</div>
+			<?php } ?>
 
 			<p>
 				<b>Update 24th March 2016:</b> Asana have discontinued the supply of API keys, so I've implemented the proper OAuth login flow. Sorry it took so long!
