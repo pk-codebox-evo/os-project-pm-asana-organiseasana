@@ -9,3 +9,12 @@ vendor/nategood/httpful/tests
 vendor/asana/asana/src/Asana/Test
 vendor/stil/curl-easy/tests
 vendor/symfony/event-dispatcher/Tests
+vendor/firebase/php-jwt/tests
+vendor/google/auth/tests
+vendor/google/cloud/tests
+vendor/guzzlehttp/promises/tests
+vendor/guzzlehttp/psr7/tests
+vendor/monolog/monolog/tests
+vendor/rize/uri-template/test
+vendor/google/cloud/docs
+vendor/google/cloud/dev/src/DocGenerator

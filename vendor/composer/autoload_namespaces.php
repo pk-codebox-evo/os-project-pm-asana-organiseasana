@@ -6,6 +6,7 @@ $vendorDir = dirname(dirname(__FILE__));
 $baseDir = dirname($vendorDir);
 
 return array(
+    'Rize\\UriTemplate' => array($vendorDir . '/rize/uri-template/src'),
     'OAuth2' => array($vendorDir . '/adoy/oauth2/src'),
     'Httpful' => array($vendorDir . '/nategood/httpful/src'),
     'Asana\\' => array($vendorDir . '/asana/asana/src'),

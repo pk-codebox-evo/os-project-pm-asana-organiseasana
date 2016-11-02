@@ -3,7 +3,8 @@
     "require": {
         "pusher/pusher-php-server": "^2.2",
          "asana/asana": "^0.4.0",
-         "stil/curl-easy": "*"
+         "stil/curl-easy": "*",
+        "google/cloud": "^0.11.1"
     },
     "authors": [
         {
