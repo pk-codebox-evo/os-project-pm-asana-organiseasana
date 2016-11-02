@@ -28,33 +28,7 @@ function asanaRequest($methodPath, $httpMethod = 'GET', $body = null, $cached = 
 		}
 	}
 
-	$access_token = getAccessToken();
-	$ratelimit = getRateLimit();
-
-	$url = "https://app.asana.com/api/1.0/$methodPath";
-	$headers = array(
-		"Content-type: application/json",
-		"Authorization: Bearer $access_token"
-	);
-	$ch = curl_init();
-	curl_setopt($ch, CURLOPT_URL, $url);
-	curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-	curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $httpMethod);
-	curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-
-    // SSL cert of Asana is selfmade
-    // curl_setopt ($ch, CURLOPT_SSL_VERIFYHOST, 0);
-    // curl_setopt ($ch, CURLOPT_SSL_VERIFYPEER, 0);
-
-	$jbody = $body;
-	if ($jbody)
-	{
-		if (!is_string($jbody))
-		{
-			$jbody = json_encode($body);
-		}
-		curl_setopt($ch, CURLOPT_POSTFIELDS, $jbody);
-	}
+	$request = createAsanaRequest($methodPath, $httpMethod, $body);
 
 	for ($i = 0; $i < 10; $i++) {
 		if ($ratelimit > time()) {
@@ -66,8 +40,13 @@ function asanaRequest($methodPath, $httpMethod = 'GET', $body = null, $cached = 
 			}
 		}
 
-		$data = curl_exec($ch);
-		$error = curl_error($ch);
+		$response = $request->send();
+		$error = null;
+		if ($response->hasError()) {
+			$error = $response->getError();
+		}
+
+		$data = $response->getContent();
 		$result = parseAsanaResponse($data);
 
 		if(isset($result['retry_after'])) {
@@ -80,14 +59,48 @@ function asanaRequest($methodPath, $httpMethod = 'GET', $body = null, $cached = 
 		break;
 	}
 
-	curl_close($ch);
-
 	cache($key, $result);
 
 	if ($DEBUG >= 2) {
 		pre(array('request' => $body, 'response' => $result), "$httpMethod " . $url);
 	}
 	return $result;
+}
+
+function createAsanaRequest($methodPath, $httpMethod = 'GET', $body = null) {
+	global $authToken;
+	global $DEBUG;
+	global $APPENGINE;
+	global $ratelimit;
+
+	$access_token = getAccessToken();
+	$ratelimit = getRateLimit();
+
+	$url = "https://app.asana.com/api/1.0/$methodPath";
+	$headers = array(
+		"Content-type: application/json",
+		"Authorization: Bearer $access_token"
+	);
+
+	$request = new \cURL\Request($url);
+	$request->getOptions()
+	    ->set(CURLOPT_TIMEOUT, 5)
+	    ->set(CURLOPT_RETURNTRANSFER, true)
+		->set(CURLOPT_CUSTOMREQUEST, $httpMethod)
+		->set(CURLOPT_HTTPHEADER, $headers);
+
+	$jbody = $body;
+	if ($jbody)
+	{
+		if (!is_string($jbody))
+		{
+			$jbody = json_encode($body);
+		}
+		$request->getOptions()
+			->set(CURLOPT_POSTFIELDS, $jbody);
+	}
+
+	return $request;
 }
 
 function parseAsanaResponse($data) {
