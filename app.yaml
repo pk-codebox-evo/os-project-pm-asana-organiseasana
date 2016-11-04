@@ -20,6 +20,9 @@ handlers:
 - url: /process/complete
   script: process_complete.php
   login: admin
+- url: /process/token
+  script: process_token.php
+  login: admin
 - url: /auth
   script: auth.php
 - url: /deauth

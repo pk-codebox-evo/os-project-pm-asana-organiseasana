@@ -342,7 +342,9 @@ if($DEBUG >= 1) {
 
 							$workspaceProjects = getProjects($workspaceId);
 							$names = function($value) { return $value['name']; };
-							array_multisort(array_map($names, $workspaceProjects), SORT_DESC, $workspaceProjects);
+							if (is_array($workspaceProjects)) {
+								array_multisort(array_map($names, $workspaceProjects), SORT_DESC, $workspaceProjects);
+							}
 
 							echo '<div class="btn-group-vertical" data-toggle="buttons">';
 							for ($i = count($workspaceProjects) - 1; $i >= 0; $i--)

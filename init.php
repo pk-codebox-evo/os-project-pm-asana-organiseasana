@@ -48,4 +48,6 @@
 
 	if (isset($_POST["channel"]))
 		$channel = $_POST['channel'];
+	if (isset($_GET["channel"]))
+		$channel = $_GET['channel'];
 ?>
