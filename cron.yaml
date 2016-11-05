@@ -1,0 +1,4 @@
+cron:
+- description: Issue new tokens
+  url: /issue/tokens
+  schedule: every 1 minute
